@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style>
+		video{
+			width:800px;
+		}
+		.bar{
+			width:;
+		}
+		.scroll{
+			width:600px;
+			height:40px;
+			background:#ccc;
+			margin:10px 0;
+			border-radius:10px;
+			position:relative;
+			overflow:hidden;
+		}
+		.bar{
+			height:40px;
+			width:0px;
+			background: #f90;
+		}
+		.bar2{
+			width:40px;
+			height:40px;
+			border-radius:10px;
+			background:blue;
+			position:absolute;
+			left:0;
+			top:0;
+		}
+		.volume{
+			width:6px;
+			height:60px;
+			background:#ccc;
+			margin-left: 170px;
+			position: relative;
+			display:none;
+		}
+		.vBar{
+			width:8px;
+			background:#666;
+			position:absolute;
+			left:-1px;
+			top:0;
+			height:6px;
+		}
+	</style>
+	<script>
+	window.onload=function(){
+		var oBtn1 = document.getElementById('btn1');
+		var oBtn2 = document.getElementById('btn2');
+		var oBtn3 = document.getElementById('btn3');
+		var oBtn4 = document.getElementById('btn4');
+		var oVa = document.querySelector('.volume');
+		var oVb = document.querySelector('.vBar');
+		var oV = document.querySelector('video');
+		var oS = document.querySelector('span');
+		var oBar = document.querySelector('.bar');
+		var oSc = document.querySelector('.scroll')
+		var oBar2 = document.querySelector('.bar2');
+		var oBox = document.querySelector('.box');
+		var bOk = false;
+		oBtn4.onclick=function(){
+			bOk = !bOk;
+			oVa.style.display='block';
+		};
+		function getPos(obj){
+			var l = 0;
+			var t = 0;
+			while(obj){
+				l = l+obj.offsetLeft;
+				t = t+obj.offsetTop;
+				obj = obj.offsetParent;
+			}
+			return {left:l,top:t}
+		}
+		oVb.onmousedown=function(ev){
+			bOk = !bOk;
+			var disY = ev.clientY-oVb.offsetTop;
+			document.onmousemove=function(ev){
+				var t = ev.clientY-disY;
+				if(t<0){
+					t=0;
+				}else if(t>(oVa.offsetHeight-oVb.offsetHeight)){
+					t=oVa.offsetHeight-oVb.offsetHeight;
+				}
+				oVb.style.top = t+'px';
+				var scale = t/(oVa.offsetHeight-oVb.offsetHeight);
+				document.title=scale;
+				oV.volume=1-scale;
+				if((1-scale)==0){
+					oBtn4.value='静音';
+				}else{
+					oBtn4.value='音量';
+				}
+			};
+			document.onmouseup=function(){
+				document.onmouseup=null;
+				document.onmousemove=null;
+			};
+			return false;
+		};
+		oBox.onclick=function(){
+			if(bOk){
+				oBtn1.value='播放';
+				oV.pause();
+			}else{
+				oBtn1.value='暂停';
+				oV.play();
+			}
+			bOk = !bOk;
+		};
+		oBtn2.onclick=function(){
+			bOk = !bOk;
+			oV.webkitRequestFullScreen();
+		};
+		oBtn1.onclick=function(){
+			if(oBtn1.value=='暂停'){
+				oBtn1.value='播放';
+				oV.pause();
+				bOk = true;
+			}else{
+				oBtn1.value='暂停';
+				oV.play();
+				bOk = false;
+			}
+		};
+		document.onkeydown=function(ev){
+			if(ev.keyCode==27){
+				oV.WebkitExitFullScreen();
+			}
+		};
+		oBtn3.onclick=function(){
+			oV.pause();
+			oV.currentTime=0;
+		};
+		oV.ontimeupdate=function(){
+			oS.innerHTML=time2min(oV.currentTime)+'/'+time2min(oV.duration);
+			var scale = oV.currentTime/oV.duration;
+			oBar.style.width=scale*oSc.offsetWidth+'px';
+			oBar2.style.left=scale*(oSc.offsetWidth-oBar2.offsetWidth)+'px';
+			if(oV.currentTime==oV.duration){
+				oBtn1.value='播放';
+			}
+		}
+		function toDou(iNum){
+			return iNum<10?'0'+iNum:''+iNum;
+		}
+		function time2min(time){
+			var sMin = parseInt(time/60);
+			var sSec = parseInt(time%60);
+			return toDou(sMin)+':'+toDou(sSec);
+		}
+		oBar2.onmousedown=function(ev){
+			var disX = ev.clientX-oBar2.offsetLeft;
+			oV.pause();
+			bOk = true;
+			document.onmousemove=function(ev){
+				var l = ev.clientX-disX;
+				var lMax = oSc.offsetWidth-oBar2.offsetWidth;
+				if(l<0){
+					l=0;
+				}else if(l>lMax){	
+					l=lMax;
+				}
+				oBar2.style.left=l+'px';
+				var scale = l/lMax;
+				oBar.style.width=scale*oSc.offsetWidth+'px';
+				oV.currentTime = scale*oV.duration;
+			};
+			document.onmouseup=function(){
+				oV.play();
+				bOk = false;
+				document.onmouseup=null;
+				document.onmousemove=null;
+			};
+			return false;
+		};
+		oSc.onclick=function(ev){
+			ev.cancelBubble=true;
+			oV.play();
+			var disX = ev.clientX-oSc.offsetLeft;
+			oBar2.style.left=disX-oBar2.offsetWidth/2+'px';
+			oBar.style.width=disX+'px';
+			var scale = disX/oSc.offsetWidth;
+			oV.currentTime = scale*oV.duration;
+			bOk = true;
+			if(oBtn1.value=='播放'){
+				oBtn1.value='暂停';
+			}
+		};
+	};
+	</script>
+</head>
+<body>
+	<div class="box">
+		<input type="button" value="播放" id="btn1"/>
+		<input type="button" value="停止" id="btn3"/>
+		<input type="button" value="全屏" id="btn2"/>
+		<input type="button" value="音量" id="btn4" />
+		<span>00:00/00:00</span>
+		<br/>
+		<div class="volume">
+			<span class="vBar"></span>
+		</div>
+		<div class="scroll">
+			<div class="bar"></div>
+			<div class="bar2"></div>
+		</div>
+		<video src="http://images.sohu.com/ytv/SH/Coke/64036020120714021103.mp4"></video>
+	</div>
+</body>
+</html>

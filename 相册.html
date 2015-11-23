@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style>
+		*{
+			margin:0;
+			padding:0;
+		}
+		.ul1{
+			list-style:none;
+			width:480px;
+			height:260px;
+			margin:100px auto;
+			position:relative;
+			-webkit-transform-style:preserve-3d;
+			-webkit-transform:perspective(800px);
+		}
+		li{
+			position:absolute;
+			left:0;
+			top:0;
+			width:100%;
+			height:100%;
+			-webkit-transition:1s all ease;
+			-webkit-transform:translateX(0px) rotateY(0deg);
+			opacity:0;
+		}
+		.l1{
+			-webkit-transform:translateX(-300px) rotateY(60deg);
+			z-index:2;
+			opacity:1;
+		}
+		.l2{
+			-webkit-transform:translateX(-400px) rotateY(60deg);
+			opacity:0;
+			z-index:1;
+		}
+		.r2{
+			-webkit-transform:translateX(400px) rotateY(-60deg);
+			opacity:0;
+			z-index:1;
+		}
+		.r1{
+			-webkit-transform:translateX(300px) rotateY(-60deg);
+			z-index:2;
+			opacity:1;
+		}
+		.cur{
+			-webkit-transform:translateX(0px) rotateY(0deg);
+			z-index:3;
+			opacity:1;
+		}
+	</style>
+	<script>
+	document.addEventListener('DOMContentLoaded',function(){
+		var oUl = document.querySelector('.ul1');
+		var aLi = oUl.querySelectorAll('li');
+		var oL = document.getElementById('btn1');
+		var oR = document.getElementById('btn2');
+		var iNow = 2;
+		var bOk = true;
+		oL.onclick=function(){
+			if(bOk==false)return;
+			bOk=false;
+			iNow--;
+			tab();
+		};
+		oR.onclick=function(){
+			if(bOk==false)return;
+			bOk=false;
+			iNow++;
+			tab();
+		};
+		function tab(){
+			for(var i=0;i<aLi.length;i++){
+				aLi[i].className='';
+			};
+			aLi[IsNow(iNow-2)].className='l2';
+			aLi[IsNow(iNow-1)].className='l1';
+			aLi[IsNow(iNow)].className='cur';
+			aLi[IsNow(iNow+1)].className='r1';
+			aLi[IsNow(iNow+2)].className='r2';
+			function fnEnd(){
+				bOk = true;
+				aLi[IsNow(iNow-1)].removeEventListener('transitionend',fnEnd,false);
+			}
+			aLi[IsNow(iNow-1)].addEventListener('transitionend',fnEnd,false);
+		}
+		function IsNow(iNow){
+			if(iNow<0){
+				return (iNow%aLi.length+aLi.length)%aLi.length;
+			}else{
+				return iNow%aLi.length;
+			}
+		}
+	},false);
+	</script>
+</head>
+<body>
+	<input type="button" value="←" id="btn1"/>
+	<input type="button" value="→" id="btn2"/>
+	<ul class="ul1">
+		<li class="l2"><img src="img1/1.jpg"></li>
+		<li class="l1"><img src="img1/2.jpg"></li>
+		<li class="cur"><img src="img1/3.jpg"></li>
+		<li class="r1"><img src="img1/4.jpg"></li>
+		<li class="r2"><img src="img1/5.jpg"></li>
+		<li><img src="img1/6.jpg"></li>
+		<li><img src="img1/7.jpg"></li>
+		<li><img src="img1/8.jpg"></li>
+		<li><img src="img1/9.jpg"></li>
+		<li><img src="img1/10.jpg"></li>
+		<li><img src="img1/11.jpg"></li>
+		<li><img src="img1/12.jpg"></li>
+	</ul>
+</body>
+</html>

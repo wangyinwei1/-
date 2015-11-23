@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style>
+		.box{
+			width:700px;
+			height:400px;
+			position:relative;
+			left:50%;
+			top:100px;
+			margin-left:-350px;
+		}
+		.box span{
+			position:absolute;
+			-webkit-transform-style:preserve-3d;
+			-webkit-transition:1s all ease;
+			-webkit-transform:perspective(800px) rotateY(0deg);
+		}
+		.box em{
+			width:100%;
+			height:100%;
+			position: absolute;
+			left:0;
+			top:0;
+		}
+		.front{
+			-webkit-transform:translateZ(1px);
+		}
+		.back{
+			
+			-webkit-transform:translateZ(-1px) scale(-1,1);
+		}
+	</style>
+	<script>
+		document.addEventListener('DOMContentLoaded',function(){
+			var oBtn = document.querySelector('input');
+			var oBox = document.querySelector('.box');
+			var R = 4;
+			var C = 7;
+			var iNow = 0;
+			for(var i=0;i<R;i++){
+				for(var j=0;j<C;j++){
+					var oS = document.createElement('span');
+					oS.style.width=oBox.offsetWidth/C+'px';
+					oS.style.height=oBox.offsetHeight/R+'px';
+					oS.innerHTML='<em class="front"></em><em class="back"></em>';
+					oBox.appendChild(oS);
+					oS.style.left=j*oS.offsetWidth+'px';
+					oS.style.top=i*oS.offsetHeight+'px';
+					oS.children[0].style.background='url(img/'+(iNow)+'.jpg) no-repeat'; 
+					oS.children[1].style.background='url(img/'+(iNow+1)+'.jpg) no-repeat'; 
+					oS.children[0].style.backgroundPosition=oS.children[1].style.backgroundPosition=-j*oS.offsetWidth+'px -'+i*oS.offsetHeight+'px';
+				}
+			}
+			var aS = oBox.children;
+			timer = null;
+			var bOk = false;
+			oBtn.onclick=function(){
+				if(bOk==true)return;
+				bOk = true;
+				var i = 0;
+				timer = setInterval(function(){
+					aS[i].style.WebkitTransform='perspective(800px) rotateY(180deg)';
+					i++;
+					if(i==aS.length){
+						clearInterval(timer);
+					}
+				},100);
+				function fnEnd(){
+					bOk = false;
+					iNow++;
+					aS[aS.length-1].removeEventListener('transitionend',fnEnd,false);
+					for(var i=0;i<aS.length;i++){
+						aS[i].style.WebkitTransition='none';
+						aS[i].style.WebkitTransform='rotate(0deg)';
+						aS[i].children[0].style.backgroundImage='url(img/'+(iNow)%3+'.jpg)'
+						aS[i].children[1].style.backgroundImage='url(img/'+(iNow+1)%3+'.jpg)'
+					}
+					setTimeout(function(){
+						for(var i=0;i<aS.length;i++){
+							aS[i].style.WebkitTransition='1s all ease';
+						}
+					},1);
+				}
+				aS[aS.length-1].addEventListener('transitionend',fnEnd,false);
+			};
+		},false);
+	</script>
+</head>
+<body>
+	<input type="button" value="翻转" />
+	<div class="box"></div>
+</body>
+</html>

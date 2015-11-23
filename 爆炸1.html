@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style>
+		.box{
+			width:700px;
+			height:400px;
+			background:url(img/0.jpg) no-repeat;
+			position:relative;
+			left:50%;
+			top:100px;
+			margin-left:-350px;
+		}
+		.box span{
+			position:absolute;
+			-webkit-transform-style:preserve-3d;
+			-webkit-transform:perspective(800px) translate(0,0) rotate(0,0);
+		}
+	</style>
+	<script>
+		document.addEventListener('DOMContentLoaded',function(){
+			var oBox = document.querySelector('.box');
+			var oBtn = document.querySelector('input');
+			var R = 4;
+			var C = 7;
+			for(var i=0;i<R;i++){
+				for(var j=0;j<C;j++){
+					var oS = document.createElement('span');
+					oS.style.width=oBox.offsetWidth/C+'px';
+					oS.style.height=oBox.offsetHeight/R+'px';
+					oS.style.background='url(img/0.jpg) no-repeat'
+					oBox.appendChild(oS);
+					oS.style.left=j*oS.offsetWidth+'px';
+					oS.style.top=i*oS.offsetHeight+'px';
+					oS.style.backgroundPosition=-j*oS.offsetWidth+'px -'+i*oS.offsetHeight+'px';
+				}
+			}
+			var aS = oBox.children;
+			var timer = null;
+			var bOk = false;
+			var iNow = 0;
+			oBtn.onclick=function(){
+				if(bOk == true)return;
+				bOk = true;
+				iNow++;
+				oBox.style.background='url(img/'+iNow%3+'.jpg) no-repeat';
+				for(var i=0;i<aS.length;i++){
+					aS[i].style.WebkitTransition='1s all ease';
+					var x1 = aS[i].offsetLeft+aS[i].offsetWidth/2;
+					var y1 = aS[i].offsetTop+aS[i].offsetHeight/2;
+					var x2 = oBox.offsetWidth/2;
+					var y2 = oBox.offsetHeight/2;
+					var disX = x1-x2;
+					var disY = y1-y2;
+					aS[i].style.WebkitTransform='perspective(800px) translate('+disX+'px,'+disY+'px) translateZ(700px) rotateX('+rnd(-180,180)+'deg) rotateY('+rnd(-180,180)+'deg)';
+					aS[i].style.opacity=0;
+				}
+				function fnEnd(){
+					bOk = false;
+					for(var i=0;i<aS.length;i++){
+						aS[i].style.transition='none';
+						aS[i].style.transform='translate(0,0)';
+						aS[i].style.opacity=1;
+						aS[i].style.backgroundImage='url(img/'+(iNow)%3+'.jpg)';
+					}
+					aS[0].removeEventListener('transitionend',fnEnd,false);
+				}
+				aS[0].addEventListener('transitionend',fnEnd,false);
+			};
+		},false);
+		function rnd(n,m){
+			return parseInt(n+Math.random()*(m-n));
+		}
+	</script>
+</head>
+<body>
+	<input type="button" value="爆炸" />
+	<div class="box"></div>
+	
+</body>
+</html>

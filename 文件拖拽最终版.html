@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style>
+		.box{
+			width:300px;
+			height:200px;
+			border:1px solid black;
+			margin:200px auto;
+			text-align:center;
+			line-height:200px;
+			display:none;
+		}
+	</style>
+	<script>
+		window.onload=function(){
+			var oBox = document.querySelector('.box');
+			var oT = document.querySelector('textarea');
+			var oS = document.querySelector('span');
+			var oB = document.querySelector('b');
+			oBox.ondragenter=function(){
+				oBox.innerHTML='你抬起鼠标';
+			};
+			oBox.ondragleave=function(){
+				oBox.innerHTML='请将文件拖拽到这里';
+			};
+			oBox.ondragover=function(){
+				return false;
+			};
+			oBox.ondrop=function(ev){
+				var oFile = ev.dataTransfer.files[0];
+				var reader = new FileReader();
+				reader.readAsDataURL(oFile);
+				reader.onload=function(){
+					oT.innerHTML=reader.result;
+					oB.innerHTML=oFile.name+','+oFile.type+','+oFile.size;
+				};
+				reader.onprogress=function(ev){
+					oS.innerHTML=(ev.loaded*100/ev.total).toFixed(2);
+				};
+				return false;
+			};
+			var timer = null;
+			document.ondragover=function(){
+				oBox.style.display='block';
+				clearTimeout(timer)
+				timer = setTimeout(function(){
+					oBox.style.display='none';
+				},300);
+			};
+		};
+	</script>
+</head>
+<body>
+	<b></b>
+	<span></span>
+	<textarea></textarea>
+	<div class="box">请将文件拖拽到这里</div>
+</body>
+</html>
